@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
-@FeignClient(value = "smp",url ="http://localhost:8087")
+@FeignClient(value = "filehandler-service")
 public interface FileServiceRepository {
     @PostMapping(value = "/api/v1/files/json")
     List<PetrolStationDto> getJsonData(@RequestParam("fileName") String fileName);

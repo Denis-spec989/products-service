@@ -21,3 +21,15 @@ spring:
 springdoc:
   swagger-ui:
     path: /swagger-ui
+feign:
+  circuitbreaker:
+    enabled=true:
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://${registry.host:localhost}:${registry.port:8760}/eureka/
+    healthcheck:
+      enabled: true # for Actuator
+  instance:
+    leaseRenewalIntervalInSeconds: 1
+    leaseExpirationDurationInSeconds: 2
