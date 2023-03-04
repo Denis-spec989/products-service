@@ -2,6 +2,7 @@ package github.denisspec989.productmainservice.service.impl;
 
 import github.denisspec989.productmainservice.domain.Price;
 import github.denisspec989.productmainservice.models.PetrolStationDto;
+import github.denisspec989.productmainservice.models.PriceDTO;
 import github.denisspec989.productmainservice.models.PriceModelDto;
 import github.denisspec989.productmainservice.repository.feign.FileServiceRepository;
 import github.denisspec989.productmainservice.repository.jpa.PriceRepository;
@@ -32,6 +33,16 @@ public class PriceServiceImpl implements PriceService {
         }
         return priceList;
     }
+    List<PriceDTO> fromPriceListToPriceDTOList(List<Price> priceList){
+        List<PriceDTO> priceDTOList = new ArrayList<>();
+        for(Price price:priceList){
+            PriceDTO priceDTO = new PriceDTO();
+            priceDTO.setFuelPrice(price.getProductPrice());
+            priceDTO.setFuelName(price.getProductName());
+            priceDTOList.add(priceDTO);
+        }
+        return priceDTOList;
+    }
     @Override
     @Scheduled(cron = "0 0 4 * * *")
     @Transactional
@@ -49,5 +60,11 @@ public class PriceServiceImpl implements PriceService {
         }
         System.out.println(savingList.size());
         priceRepository.saveAll(savingList);
+    }
+
+    @Override
+    @Transactional
+    public List<PriceDTO> getPricesOnAzs(String azsId) {
+        return fromPriceListToPriceDTOList(priceRepository.findAllByAzsId(azsId));
     }
 }
