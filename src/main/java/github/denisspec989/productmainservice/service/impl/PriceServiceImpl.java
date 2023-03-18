@@ -8,6 +8,7 @@ import github.denisspec989.productmainservice.repository.feign.FileServiceReposi
 import github.denisspec989.productmainservice.repository.jpa.PriceRepository;
 import github.denisspec989.productmainservice.service.PriceService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,9 +49,14 @@ public class PriceServiceImpl implements PriceService {
     @Transactional
     public void scheduledGetNewPrices() {
         System.out.println("start scheduling");
-        List<Price> savingList = fromPetrolStationDtoListToPriceList(fileServiceRepository.getJsonData("Azs_with_prices_and_services"));
-        System.out.println(savingList.size());
-        List<Price> xmlList = fromPetrolStationDtoListToPriceList(fileServiceRepository.getXmlData("Azs_with_prices_and_services"));
+        ResponseEntity<List<PetrolStationDto>> responseJson;
+        ResponseEntity<List<PetrolStationDto>> responseXML;
+        do {
+            responseJson = fileServiceRepository.getJsonData("Azs_with_prices_and_services");
+            responseXML=fileServiceRepository.getXmlData("Azs_with_prices_and_services");
+        } while (!(responseJson.getStatusCode().value()==200&&responseXML.getStatusCode().value()==200));
+        List<Price> savingList = fromPetrolStationDtoListToPriceList(fileServiceRepository.getJsonData("Azs_with_prices_and_services").getBody());
+        List<Price> xmlList = fromPetrolStationDtoListToPriceList(fileServiceRepository.getXmlData("Azs_with_prices_and_services").getBody());
         for(Price price:xmlList){
             if(savingList.contains(price)){
                 continue;
@@ -58,7 +64,6 @@ public class PriceServiceImpl implements PriceService {
                 savingList.add(price);
             }
         }
-        System.out.println(savingList.size());
         priceRepository.saveAll(savingList);
     }
 
