@@ -11,16 +11,24 @@ public class JsonUtil {
     public static List<String> processString(String inputString, Boolean needReplaceArraysSymbol) {
         inputString = inputString.replaceAll("\\[]","\\[*]");
         if(needReplaceArraysSymbol){
-            inputString = inputString.replaceAll("\\[*]","");
+            inputString = inputString.replaceAll("\\[\\*\\]","");
         }
         List<String> outputList = new ArrayList<>();
         List<String> elements = Arrays.stream(inputString.split("\\.")).collect(Collectors.toList());
-        elements.remove(0);
         elements.forEach(element->{
-            element = s7VariableSymbol.concat(element);
+            //element = s7VariableSymbol.concat(element);
             outputList.add(element);
         });
 
+        return outputList;
+    }
+    public static List<DictionaryDto> preparareJsonS7Expression(List<DictionaryDto> dictionaryDtos){
+        List<DictionaryDto> outputList = new ArrayList<>();
+        dictionaryDtos.stream().forEach(dictionaryDto -> {
+            dictionaryDto.setJsonContainer(dictionaryDto.getJsonContainer().replaceAll("\\[]","[*]"));
+            dictionaryDto.setReturnContainers(dictionaryDto.getReturnContainers().replaceAll("\\[]","[*]"));
+            outputList.add(dictionaryDto);
+        });
         return outputList;
     }
 

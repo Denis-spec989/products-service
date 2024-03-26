@@ -296,7 +296,7 @@ public class JsonPathExample {
     /*
     String[] jsonStrings = {
                 "$.result.riskMetricData.limitFzhnData.buildings[]",
-                "$.result.riskMetricData.limitFzhnData.buildings.saleDistrib[]"
+                "$.result.riskMetricData.limitFzhnData.buildings[].saleDistrib[]"
         };
         String[] jsonStrings2 = {
                 "$.result[]",
