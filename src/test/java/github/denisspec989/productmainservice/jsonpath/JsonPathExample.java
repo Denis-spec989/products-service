@@ -1,18 +1,27 @@
 package github.denisspec989.productmainservice.jsonpath;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jayway.jsonpath.*;
+import com.jayway.jsonpath.internal.JsonContext;
+import github.denisspec989.productmainservice.JsonRow;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import lombok.Data;
+import org.json.JSONException;
 import org.junit.jupiter.api.Test;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 
+import static github.denisspec989.productmainservice.JsonParser.*;
 import static github.denisspec989.productmainservice.JsonUtil.processString;
 
 public class JsonPathExample {
     @Test
-    public void testJson(){
+    public void testJson() {
         // Ваш JSON
         String json = "{\n" +
                 "  \"error_code\": 0,\n" +
@@ -62,8 +71,9 @@ public class JsonPathExample {
 
 
     }
+
     @Test
-    public void testJsonTwo(){
+    public void testJsonTwo() {
         // Ваш JSON
         String json = "{\n" +
                 "  \"result\": {\n" +
@@ -102,15 +112,18 @@ public class JsonPathExample {
 
         // Используем библиотеку JsonPath для извлечения пути ко всем элементам массива "saleDistrib"
         Object document = Configuration.defaultConfiguration().jsonProvider().parse(json);
-        String path = "$.result.riskMetricData.limitFzhnData.buildings[*].saleDistrib[*]";
+        String path = "$.result.riskMetricData.limitFzhnData.buildings[*]";
         Object saleDistribElements = JsonPath.read(document, path);
-
+        DocumentContext outputContext = JsonPath.parse("{\"result\": [[]]}");
+        outputContext.set("$.result", saleDistribElements);
+        System.out.println(outputContext.jsonString());
         // Выводим результат
-        System.out.println("Путь ко всем элементам массива 'saleDistrib': " + saleDistribElements);
+        //System.out.println("Путь ко всем элементам массива 'saleDistrib': " + saleDistribElements);
 
     }
+
     @Test
-    public void testJsonThree(){
+    public void testJsonThree() {
         // Ваш исходный JSON
         String json = "{\n" +
                 "  \"result\": [\n" +
@@ -178,8 +191,9 @@ public class JsonPathExample {
         // Выводим результат
         System.out.println(resultJson.toJSONString());
     }
+
     @Test
-    public void testJsonFour(){
+    public void testJsonFour() throws JsonProcessingException {
         String json = "{\n" +
                 "  \"error_code\": 0,\n" +
                 "  \"error_message\": \"ut\",\n" +
@@ -218,7 +232,43 @@ public class JsonPathExample {
                 "  ]\n" +
                 "}";
 
-        ReadContext context = JsonPath.parse(json);
+        Object document = Configuration.defaultConfiguration().jsonProvider().parse(json);
+        String path = "$.result[0]";
+        Object resultElements = JsonPath.read(document, path);
+        JSONObject outputRootObject = new JSONObject();
+        JSONObject outputResultObject = new JSONObject();
+        JSONObject outputRiskMetricData = new JSONObject();
+        JSONArray outputLimitFzhnData = new JSONArray();
+        outputRiskMetricData.put("limitFzhnData", outputLimitFzhnData);
+        outputResultObject.put("riskMetricData", outputRiskMetricData);
+        outputRootObject.put("result", outputResultObject);
+        //System.out.println(outputRootObject.toJSONString());
+        DocumentContext outputContext = JsonPath.parse(outputRootObject);
+
+        outputContext.set("$.result.riskMetricData.limitFzhnData", resultElements);
+        //System.out.println(outputContext.jsonString());
+        //ObjectMapper objectMapper = new ObjectMapper();
+        //JsonNode jsonNode = objectMapper.readTree(outputContext.jsonString());
+        //System.out.println(jsonNode);
+        //ObjectNode objectNode = (ObjectNode) jsonNode;
+        //objectNode.remove("result");
+        //System.out.println(objectMapper.writeValueAsString(objectNode));
+        //JSONArray fieldNames = JsonPath.read(outputContext.jsonString(), "$.result.riskMetricData.limitFzhnData");
+        //System.out.println(fieldNames);
+        //outputContext.delete("$.result.riskMetricData.limitFzhnData[*].id_corpus");
+        //System.out.println( outputLimitFzhnData.entrySet());
+        //outputRootObject = outputContext.json();
+//
+        //outputResultObject = (JSONObject) outputRootObject.entrySet().stream().findFirst().get().getValue();
+        //System.out.println(outputResultObject.entrySet());
+        //outputRiskMetricData = (JSONObject ) outputResultObject.entrySet().stream().findFirst().get().getValue();
+        //outputLimitFzhnData = (JSONArray ) outputRiskMetricData.entrySet().stream().findFirst().get().getValue();
+        //System.out.println(outputLimitFzhnData);
+        //System.out.println(outputLimitFzhnData.toJSONString());
+        //DocumentContext outputContext = JsonPath.parse();
+        //outputContext.set("$.result",resultElements);
+        //System.out.println(outputContext.jsonString());
+        //ReadContext context = JsonPath.parse(json);
 
         //JSONArray results = context.read("$.result");
         //JsonArray buildingsArray = new JsonArray();
@@ -252,23 +302,26 @@ public class JsonPathExample {
         //outputJson.add("result",resultJson);
         //System.out.println(new Gson().toJson(outputJson));
     }
+
     @Test
-    public void testJsonFive(){
+    public void testJsonFive() {
 
     }
+
     @Test
-    public void separateString(){
+    public void separateString() {
         String s7expression = "$.result.riskMetricData.limitFzhnData.buildings[*]";
         String s7expression2 = "$.result[*].saleDistrib[*]";
-        List<String> outputList = processString(s7expression,false);
+        List<String> outputList = processString(s7expression, false);
 
         for (String element : outputList) {
             System.out.println(element);
         }
 
     }
+
     @Test
-    public void testS7Expression(){
+    public void testS7Expression() {
         String json = "[\n" +
                 "  { result:{\n" +
                 "    \"name\": \"Alice\",\n" +
@@ -285,7 +338,7 @@ public class JsonPathExample {
                 "]";
         Object document = Configuration.defaultConfiguration().jsonProvider().parse(json);
         String path = "$.[*]";
-        System.out.println((JSONArray) JsonPath.read(document,path));
+        System.out.println((JSONArray) JsonPath.read(document, path));
         /*
         Object document = Configuration.defaultConfiguration().jsonProvider().parse(json);
         String path = "$.result.riskMetricData.limitFzhnData.buildings[*].saleDistrib[*]";
@@ -293,6 +346,7 @@ public class JsonPathExample {
          */
 
     }
+
     /*
     String[] jsonStrings = {
                 "$.result.riskMetricData.limitFzhnData.buildings[]",
@@ -303,9 +357,95 @@ public class JsonPathExample {
                 "$.result[].saleDistrib[].year"
         };
      */
-    @Data
-    private class SaleClass{
-        private String year;
-        private String quarter;
+    @Test
+    public void testSeven() throws JsonProcessingException {
+        String json = "{\"result\":{\"riskMetricData\":{\"limitFzhnData\":[{\"id_corpus\":\"in sint esse\",\"cost_1m\":-1272.006,\"sale_distrib\":[{\"year\":2019,\"quarter\":1,\"sale_pct\":1,\"sale_square\":1}]},{\"id_corpus\":\"quis amet tempor\",\"cost_1m\":1375,\"sale_distrib\":[{\"year\":2018,\"quarter\":3,\"sale_pct\":3,\"sale_square\":3},{\"year\":2017,\"quarter\":4,\"sale_pct\":4,\"sale_square\":4}]}]}}}";
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode rootNode = objectMapper.readTree(json);
+
+        String containerNameToRemove = "riskMetricData";
+
+        if (rootNode.has(containerNameToRemove)) {
+            ObjectNode objectNode = (ObjectNode) rootNode;
+            objectNode.remove(containerNameToRemove);
+        }
+
+        String updatedJson = objectMapper.writeValueAsString(rootNode);
+        System.out.println(updatedJson);
+    }
+
+    @Test
+    public void testAgainAndAgain() {
+        //String jsonString = "{\"result\": {\"riskMetricData\": {\"limitFzhnData\": {\"buildings\": [{\"sale_distrib\": [{\"year\": 2019,\"quarter\": 1,\"sale_pct\": 1,\"sale_square\": 1}]},{\"sale_distrib\": [{\"year\": 2018,\"quarter\": 3,\"sale_pct\": 3,\"sale_square\": 3},{\"year\": 2017,\"quarter\": 4,\"sale_pct\": 4,\"sale_square\": 4}]}]}}} }";
+        String jsonString = "{\n" +
+                "  \"result\": {\n" +
+                "    \"riskMetricData\": {\n" +
+                "      \"limitFzhnData\": {\n" +
+                "        \"buildings\": [\n" +
+                "          {\n" +
+                "            \"id\": \"in sint esse\",\n" +
+                "            \"cost1m\": -1272.006,\n" +
+                "            \"saleDistrib\": [\n" +
+                "              {\n" +
+                "                \"year\": 2019,\n" +
+                "                \"quarter\": 1,\n" +
+                "                \"salePct\": 1,\n" +
+                "                \"saleSquare\": 1\n" +
+                "              }\n" +
+                "            ]\n" +
+                "          },\n" +
+                "          {\n" +
+                "            \"id\": \"quis amet tempor\",\n" +
+                "            \"cost1m\": 1375,\n" +
+                "            \"saleDistrib\": [\n" +
+                "              {\n" +
+                "                \"year\": 2018,\n" +
+                "                \"quarter\": 3,\n" +
+                "                \"salePct\": 3,\n" +
+                "                \"saleSquare\": 3\n" +
+                "              },\n" +
+                "              {\n" +
+                "                \"year\": 2017,\n" +
+                "                \"quarter\": 4,\n" +
+                "                \"salePct\": 4,\n" +
+                "                \"saleSquare\": 4\n" +
+                "              }\n" +
+                "            ]\n" +
+                "          }\n" +
+                "        ]\n" +
+                "      }\n" +
+                "    }\n" +
+                "  }\n" +
+                "}";
+       //List<String> filterPaths = List.of(
+       //        "$.result.riskMetricData.limitFzhnData.buildings[].id"
+       //);
+
+        List<JsonRow> jsonRows = parseJson(jsonString);
+        //System.out.println(jsonRows);
+        List<String> filters = List.of(
+                "$.result.riskMetricData.limitFzhnData.buildings[*].id",
+                "$.result.riskMetricData.limitFzhnData.buildings[*].saleDistrib[*].saleSquare"
+        );
+        List<JsonRow> filteredRows = filterJsonRows(jsonRows, filters);
+        for (JsonRow row : filteredRows) {
+            System.out.println(row);
+        }
+        //for (JsonRow row : jsonRows) {
+        //    System.out.println("JsonPath: " + row.getJsonPath());
+        //    System.out.println("Value: " + row.getValue());
+        //    System.out.println();
+        //}
+
+    }
+    @Test
+    public void removeSquareBracketsTest(){
+        String[] strings = {"abvgd[0]", "dsadasfsaf[8]", "dsawarrs[*]"};
+
+        for (String str : strings) {
+            String result = removeSquareBrackets(str);
+            System.out.println(result);
+        }
     }
 }
