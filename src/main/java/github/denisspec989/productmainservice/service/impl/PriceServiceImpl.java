@@ -1,5 +1,7 @@
 package github.denisspec989.productmainservice.service.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import github.denisspec989.productmainservice.domain.Price;
 import github.denisspec989.productmainservice.models.PetrolStationDto;
 import github.denisspec989.productmainservice.models.PriceDTO;
@@ -14,7 +16,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
+
 @Service
 @RequiredArgsConstructor
 public class PriceServiceImpl implements PriceService {
@@ -34,6 +40,7 @@ public class PriceServiceImpl implements PriceService {
         }
         return priceList;
     }
+    
     List<PriceDTO> fromPriceListToPriceDTOList(List<Price> priceList){
         List<PriceDTO> priceDTOList = new ArrayList<>();
         for(Price price:priceList){
@@ -44,26 +51,28 @@ public class PriceServiceImpl implements PriceService {
         }
         return priceDTOList;
     }
+    
     @Override
     @Scheduled(cron = "0 0 4 * * *")
     @Transactional
     public void scheduledGetNewPrices() {
-        System.out.println("start scheduling");
+        Logger log = LoggerFactory.getLogger(getClass());
+        log.info("start scheduling");
         ResponseEntity<List<PetrolStationDto>> responseJson;
         ResponseEntity<List<PetrolStationDto>> responseXML;
         do {
             responseJson = fileServiceRepository.getJsonData("Azs_with_prices_and_services");
-            responseXML=fileServiceRepository.getXmlData("Azs_with_prices_and_services");
-        } while (!(responseJson.getStatusCode().value()==200&&responseXML.getStatusCode().value()==200));
-        List<Price> savingList = fromPetrolStationDtoListToPriceList(fileServiceRepository.getJsonData("Azs_with_prices_and_services").getBody());
-        List<Price> xmlList = fromPetrolStationDtoListToPriceList(fileServiceRepository.getXmlData("Azs_with_prices_and_services").getBody());
-        for(Price price:xmlList){
-            if(savingList.contains(price)){
-                continue;
-            } else {
-                savingList.add(price);
+            responseXML = fileServiceRepository.getXmlData("Azs_with_prices_and_services");
+        } while (!(responseJson.getStatusCode().value() == 200 && responseXML.getStatusCode().value() == 200));
+        
+        Set<Price> savingSet = new HashSet<>(fromPetrolStationDtoListToPriceList(responseJson.getBody()));
+        List<Price> xmlList = fromPetrolStationDtoListToPriceList(responseXML.getBody());
+        for (Price price : xmlList) {
+            if (!savingSet.contains(price)) {
+                savingSet.add(price);
             }
         }
+        List<Price> savingList = new ArrayList<>(savingSet);
         priceRepository.saveAll(savingList);
     }
 

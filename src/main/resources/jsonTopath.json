@@ -1,0 +1,40 @@
+{
+  "result": {
+    "riskMetricData": {
+      "limitFzhnData": {
+        "buildings": [
+          {
+            "id": "in sint esse",
+            "cost1m": -1272.006,
+            "saleDistrib": [
+              {
+                "year": 2019,
+                "quarter": 1,
+                "salePct": 1,
+                "saleSquare": 1
+              }
+            ]
+          },
+          {
+            "id": "quis amet tempor",
+            "cost1m": 1375,
+            "saleDistrib": [
+              {
+                "year": 2018,
+                "quarter": 3,
+                "salePct": 3,
+                "saleSquare": 3
+              },
+              {
+                "year": 2017,
+                "quarter": 4,
+                "sale_pct": 4,
+                "sale_square": 4
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}
