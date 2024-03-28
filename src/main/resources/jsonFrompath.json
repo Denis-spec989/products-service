@@ -1,37 +1,34 @@
-{\n" +
-"  \"error_code\": 0,\n" +
-"  \"error_message\": \"ut\",\n" +
-"  \"response_schema_version\": 3676,\n" +
-"  \"result\": [\n" +
-"    {\n" +
-"      \"id_corpus\": \"in sint esse\",\n" +
-"      \"cost_1m\": -1272.006,\n" +
-"      \"sale_distrib\": [\n" +
-"        {\n" +
-"          \"year\": 2019,\n" +
-"          \"quarter\": 1,\n" +
-"          \"sale_pct\": 1,\n" +
-"          \"sale_square\": 1\n" +
-"        }\n" +
-"      ]\n" +
-"    },\n" +
-"    {\n" +
-"      \"id_corpus\": \"quis amet tempor\",\n" +
-"      \"cost_1m\": 1375,\n" +
-"      \"sale_distrib\": [\n" +
-"        {\n" +
-"          \"year\": 2018,\n" +
-"          \"quarter\": 3,\n" +
-"          \"sale_pct\": 3,\n" +
-"          \"sale_square\": 3\n" +
-"        },\n" +
-"        {\n" +
-"          \"year\": 2017,\n" +
-"          \"quarter\": 4,\n" +
-"          \"sale_pct\": 4,\n" +
-"          \"sale_square\": 4\n" +
-"        }\n" +
-"      ]\n" +
-"    }\n" +
-"  ]\n" +
-"}
+{
+  "result": [
+    {
+      "id_corpus": "in sint esse",
+      "cost_1m": -1272.006,
+      "sale_distrib": [
+        {
+          "year": 2019,
+          "quarter": 1,
+          "sale_pct": 1,
+          "sale_square": 1
+        }
+      ]
+    },
+    {
+      "id_corpus": "quis amet tempor",
+      "cost_1m": 1375,
+      "sale_distrib": [
+        {
+          "year": 2018,
+          "quarter": 3,
+          "sale_pct": 3,
+          "sale_square": 3
+        },
+        {
+          "year": 2017,
+          "quarter": 4,
+          "sale_pct": 4,
+          "sale_square": 4
+        }
+      ]
+    }
+  ]
+}
