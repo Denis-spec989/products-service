@@ -5,16 +5,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jayway.jsonpath.*;
-import com.jayway.jsonpath.internal.JsonContext;
 import github.denisspec989.productmainservice.JsonRow;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
-import lombok.Data;
-import org.json.JSONException;
 import org.junit.jupiter.api.Test;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 import static github.denisspec989.productmainservice.JsonParser.*;
@@ -378,7 +376,6 @@ public class JsonPathExample {
 
     @Test
     public void testAgainAndAgain() {
-        //String jsonString = "{\"result\": {\"riskMetricData\": {\"limitFzhnData\": {\"buildings\": [{\"sale_distrib\": [{\"year\": 2019,\"quarter\": 1,\"sale_pct\": 1,\"sale_square\": 1}]},{\"sale_distrib\": [{\"year\": 2018,\"quarter\": 3,\"sale_pct\": 3,\"sale_square\": 3},{\"year\": 2017,\"quarter\": 4,\"sale_pct\": 4,\"sale_square\": 4}]}]}}} }";
         String jsonString = "{\n" +
                 "  \"result\": [\n" +
                 "    {\n" +
@@ -413,29 +410,15 @@ public class JsonPathExample {
                 "    }\n" +
                 "  ]\n" +
                 "}\n";
-       //List<String> filterPaths = List.of(
-       //        "$.result.riskMetricData.limitFzhnData.buildings[].id"
-       //);
 
-        List<JsonRow> jsonRows = parseJson(jsonString);
-        //System.out.println(jsonRows);
-        List<String> filters = List.of(
-                "$.result.riskMetricData.limitFzhnData.buildings[*].id",
-                "$.result.riskMetricData.limitFzhnData.buildings[*].saleDistrib[*].saleSquare"
-        );
+        List<JsonRow> jsonRows = parseJson(new ByteArrayInputStream(jsonString.getBytes()));
         HashMap<String,String> filtersWithReplacement = new HashMap<>();
-        filtersWithReplacement.put("$.result[*].id_corpus","$.result.riskMetricData.limitFzhnData.buildings[].id");
-        filtersWithReplacement.put("$.result[*].sale_distrib[*].sale_square","$.result.riskMetricData.limitFzhnData.buildings[].saleDistrib[].saleSquare");
-        List<JsonRow> filteredRows = filterJsonRows(jsonRows, filtersWithReplacement);
+        filtersWithReplacement.put("$.result[].id_corpus","$.result.riskMetricData.limitFzhnData.buildings[].id");
+        filtersWithReplacement.put("$.result[].sale_distrib[].sale_square","$.result.riskMetricData.limitFzhnData.buildings[].saleDistrib[].saleSquare");
+        List<JsonRow> filteredRows = filterJsonRowsWithReplacement(jsonRows, filtersWithReplacement);
         for (JsonRow row : filteredRows) {
             System.out.println(row);
         }
-        //for (JsonRow row : jsonRows) {
-        //    System.out.println("JsonPath: " + row.getJsonPath());
-        //    System.out.println("Value: " + row.getValue());
-        //    System.out.println();
-        //}
-
     }
     @Test
     public void removeSquareBracketsTest(){
