@@ -7,8 +7,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class JsonRow {
-    String jsonPath;
-    Object value;
+    private String jsonPath;
+    private Object value;
 
     public JsonRow(String jsonPath, Object value) {
         this.jsonPath = "$"+jsonPath;

@@ -4,7 +4,9 @@ import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,7 +40,7 @@ public class JsonParser {
         List<JsonRow> filteredRows = new ArrayList<>();
 
         for (JsonRow row : jsonRows) {
-            if (filterPaths.stream().noneMatch(row.jsonPath::contains)) {
+            if (filterPaths.stream().noneMatch(row.getJsonPath()::contains)) {
                 filteredRows.add(row);
             }
         }
@@ -48,8 +50,8 @@ public class JsonParser {
 
 
 
-    private static boolean matchesFilter(String jsonPath, String filter) {
-            String[] jsonPathParts = jsonPath.split("\\.");
+    private static boolean matchesFilter(JsonRow jsonRow, String filter,String newJsonPath) {
+            String[] jsonPathParts = jsonRow.getJsonPath().split("\\.");
             String[] filterParts = filter.split("\\.");
 
             if (jsonPathParts.length != filterParts.length) {
@@ -63,22 +65,23 @@ public class JsonParser {
                             return false;
                         }
                 }
-
+            newJsonPath = fillString(jsonRow.getJsonPath(),newJsonPath);
+            jsonRow.setJsonPath(newJsonPath);
             return true;
         }
-    private static boolean matchesAnyFilter(String jsonPath, List<String> filters) {
-            for (String filter : filters) {
-                    if (matchesFilter(jsonPath, filter)) {
+    private static boolean matchesAnyFilter(JsonRow jsonRow, Map<String,String> filters) {
+            for (String filter : filters.keySet()) {
+                    if (matchesFilter(jsonRow, filter,filters.get(filter))) {
                             return true;
                         }
                 }
             return false;
         }
-    public static List<JsonRow> filterJsonRows(List<JsonRow> jsonRows, List<String> filters) {
+    public static List<JsonRow> filterJsonRows(List<JsonRow> jsonRows, Map<String,String> filtersWithReplacement) {
             List<JsonRow> filteredRows = new ArrayList<>();
 
             for (JsonRow row : jsonRows) {
-                    if (matchesAnyFilter(row.jsonPath, filters)) {
+                    if (matchesAnyFilter(row, filtersWithReplacement)) {
                             filteredRows.add(row);
                         }
                 }
@@ -143,7 +146,12 @@ public class JsonParser {
         String[] outputValues = extractValues(outputStr);
 
         for (int i = 0; i < inputValues.length; i++) {
-            outputStr = outputStr.replaceFirst("\\[\\]", "[" + inputValues[i] + "]");
+            if(outputStr.contains("[]")){
+                outputStr = outputStr.replaceFirst("\\[\\]", "[" + inputValues[i] + "]");
+            }else {
+                outputStr = outputStr.replaceFirst("\\[\\*\\]", "[" + inputValues[i] + "]");
+            }
+
         }
 
         return outputStr;

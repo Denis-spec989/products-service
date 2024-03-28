@@ -13,6 +13,7 @@ import lombok.Data;
 import org.json.JSONException;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -379,45 +380,39 @@ public class JsonPathExample {
     public void testAgainAndAgain() {
         //String jsonString = "{\"result\": {\"riskMetricData\": {\"limitFzhnData\": {\"buildings\": [{\"sale_distrib\": [{\"year\": 2019,\"quarter\": 1,\"sale_pct\": 1,\"sale_square\": 1}]},{\"sale_distrib\": [{\"year\": 2018,\"quarter\": 3,\"sale_pct\": 3,\"sale_square\": 3},{\"year\": 2017,\"quarter\": 4,\"sale_pct\": 4,\"sale_square\": 4}]}]}}} }";
         String jsonString = "{\n" +
-                "  \"result\": {\n" +
-                "    \"riskMetricData\": {\n" +
-                "      \"limitFzhnData\": {\n" +
-                "        \"buildings\": [\n" +
-                "          {\n" +
-                "            \"id\": \"in sint esse\",\n" +
-                "            \"cost1m\": -1272.006,\n" +
-                "            \"saleDistrib\": [\n" +
-                "              {\n" +
-                "                \"year\": 2019,\n" +
-                "                \"quarter\": 1,\n" +
-                "                \"salePct\": 1,\n" +
-                "                \"saleSquare\": 1\n" +
-                "              }\n" +
-                "            ]\n" +
-                "          },\n" +
-                "          {\n" +
-                "            \"id\": \"quis amet tempor\",\n" +
-                "            \"cost1m\": 1375,\n" +
-                "            \"saleDistrib\": [\n" +
-                "              {\n" +
-                "                \"year\": 2018,\n" +
-                "                \"quarter\": 3,\n" +
-                "                \"salePct\": 3,\n" +
-                "                \"saleSquare\": 3\n" +
-                "              },\n" +
-                "              {\n" +
-                "                \"year\": 2017,\n" +
-                "                \"quarter\": 4,\n" +
-                "                \"salePct\": 4,\n" +
-                "                \"saleSquare\": 4\n" +
-                "              }\n" +
-                "            ]\n" +
-                "          }\n" +
-                "        ]\n" +
-                "      }\n" +
+                "  \"result\": [\n" +
+                "    {\n" +
+                "      \"id_corpus\": \"in sint esse\",\n" +
+                "      \"cost_1m\": -1272.006,\n" +
+                "      \"sale_distrib\": [\n" +
+                "        {\n" +
+                "          \"year\": 2019,\n" +
+                "          \"quarter\": 1,\n" +
+                "          \"sale_pct\": 1,\n" +
+                "          \"sale_square\": 1\n" +
+                "        }\n" +
+                "      ]\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"id_corpus\": \"quis amet tempor\",\n" +
+                "      \"cost_1m\": 1375,\n" +
+                "      \"sale_distrib\": [\n" +
+                "        {\n" +
+                "          \"year\": 2018,\n" +
+                "          \"quarter\": 3,\n" +
+                "          \"sale_pct\": 3,\n" +
+                "          \"sale_square\": 3\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"year\": 2017,\n" +
+                "          \"quarter\": 4,\n" +
+                "          \"sale_pct\": 4,\n" +
+                "          \"sale_square\": 4\n" +
+                "        }\n" +
+                "      ]\n" +
                 "    }\n" +
-                "  }\n" +
-                "}";
+                "  ]\n" +
+                "}\n";
        //List<String> filterPaths = List.of(
        //        "$.result.riskMetricData.limitFzhnData.buildings[].id"
        //);
@@ -428,7 +423,10 @@ public class JsonPathExample {
                 "$.result.riskMetricData.limitFzhnData.buildings[*].id",
                 "$.result.riskMetricData.limitFzhnData.buildings[*].saleDistrib[*].saleSquare"
         );
-        List<JsonRow> filteredRows = filterJsonRows(jsonRows, filters);
+        HashMap<String,String> filtersWithReplacement = new HashMap<>();
+        filtersWithReplacement.put("$.result[*].id_corpus","$.result.riskMetricData.limitFzhnData.buildings[].id");
+        filtersWithReplacement.put("$.result[*].sale_distrib[*].sale_square","$.result.riskMetricData.limitFzhnData.buildings[].saleDistrib[].saleSquare");
+        List<JsonRow> filteredRows = filterJsonRows(jsonRows, filtersWithReplacement);
         for (JsonRow row : filteredRows) {
             System.out.println(row);
         }
