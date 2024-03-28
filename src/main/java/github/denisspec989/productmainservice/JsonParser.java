@@ -5,6 +5,8 @@ import com.jayway.jsonpath.JsonPath;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class JsonParser {
     public static List<JsonRow> parseJson(String jsonString) {
@@ -101,4 +103,62 @@ public class JsonParser {
 
         return sb.toString();
     }
+    public static String fillPlaceholders(String inputString, String targetString) {
+        StringBuilder result = new StringBuilder();
+        int inputIndex = 0;
+        int targetIndex = 0;
+
+        while (inputIndex < inputString.length() && targetIndex < targetString.length()) {
+            if (inputString.charAt(inputIndex) == '[' && targetString.charAt(targetIndex) == '[') {
+                // Находим значение внутри квадратных скобок в inputString
+                StringBuilder value = new StringBuilder();
+                inputIndex++;
+                while (inputString.charAt(inputIndex) != ']') {
+                    value.append(inputString.charAt(inputIndex));
+                    inputIndex++;
+                }
+
+                // Вставляем найденное значение в targetString
+                result.append(targetString, targetIndex, targetString.indexOf('[', targetIndex));
+                result.append("[");
+                result.append(value);
+                result.append("]");
+
+                // Продвигаем индексы к следующим позициям после найденных скобок
+                inputIndex++;
+                targetIndex = targetString.indexOf('[', targetIndex) + 1;
+            } else {
+                result.append(targetString.charAt(targetIndex));
+                targetIndex++;
+            }
+        }
+
+        // Добавляем оставшуюся часть targetString, если она еще не добавлена
+        result.append(targetString.substring(targetIndex));
+
+        return result.toString();
+    }
+    public static String fillString(String inputStr, String outputStr) {
+        String[] inputValues = extractValues(inputStr);
+        String[] outputValues = extractValues(outputStr);
+
+        for (int i = 0; i < inputValues.length; i++) {
+            outputStr = outputStr.replaceFirst("\\[\\]", "[" + inputValues[i] + "]");
+        }
+
+        return outputStr;
+    }
+
+    private static String[] extractValues(String str) {
+        List<String> values = new ArrayList<>();
+        Pattern pattern = Pattern.compile("\\[(.*?)\\]");
+        Matcher matcher = pattern.matcher(str);
+
+        while (matcher.find()) {
+            values.add(matcher.group(1));
+        }
+
+        return values.toArray(new String[0]);
+    }
+
 }

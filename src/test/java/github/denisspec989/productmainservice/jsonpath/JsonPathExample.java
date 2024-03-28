@@ -441,11 +441,19 @@ public class JsonPathExample {
     }
     @Test
     public void removeSquareBracketsTest(){
-        String[] strings = {"abvgd[0]", "dsadasfsaf[8]", "dsawarrs[*]"};
+        String[] strings = {"abvgd[].asdsad", "dsadasfsaf[8]", "dsawarrs[*]"};
 
         for (String str : strings) {
             String result = removeSquareBrackets(str);
             System.out.println(result);
         }
+    }
+    @Test
+    public void testFillPlaceholdersTest(){
+        String inputStr = "$.abdfasfasf.result[0].sale_distrib[1].asdasd[85].year";
+        String outputStr = "$.output.riskMetricData.limitFzhnData.buildings[].saleDistrib[].dsadsa.sdadsdasd[]";
+
+        String result = fillString(inputStr, outputStr);
+        System.out.println(result);
     }
 }
